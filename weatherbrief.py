@@ -109,6 +109,7 @@ def create_city_info_struct_from_str(input):
             city = json.loads(r.text)['location']
             if len(city) != 1:
                 print("there is ambiguity when fetching the city, can't get exact weather")
+                print(city)
                 return None
             else:
                 # print(city[0])
@@ -184,31 +185,37 @@ def build_message_header_for_disaster_rainsnow(city_struct_arr):
     rainsnow_alarms =[]
     disaster_strs =[]
     rainsnow_strs = []
+    disaster_str = ""
+    rainsnow_str = ""
     for city in city_struct_arr:
         if city.disasteralarm != None:
             if_alarm_disaster = True
             overall_disaster_alarm_str += (f'{city.name} ')
             for disasteralarm in city.disasteralarm:
                 disaster_alarms.append(f'{disasteralarm.title}\n{disasteralarm.severity}\n{disasteralarm.text}')
-            disaster_str = f'【{city.name}】{connect_strs(disaster_alarms, "\n")}'
+            disaster_alarms_str = connect_strs(disaster_alarms, '\n')
+            disaster_str = f"【{city.name}】{disaster_alarms_str}"
             disaster_strs.append(disaster_str)
+            disaster_str = connect_strs(disaster_alarms, "\n")
 
         if city.rainsnowalarm != None:
             if_alarm_rain_snow = True
             overall_rainsnow_alarm_str += (city.name + " ")
-            rainsnow_str = f'【{city.name}】{city.rainsnowalarm}'
+            rainsnow_str = f"【{city.name}】{city.rainsnowalarm}"
             rainsnow_strs.append(rainsnow_str)
+            rainsnow_str = connect_strs(rainsnow_strs, '\n')
 
     print(f'if_alarm_rain_snow: {if_alarm_rain_snow}')
     print(f'if_alarm_disaster: {if_alarm_disaster}')
 
     header = ""
     if if_alarm_rain_snow and if_alarm_disaster:
-        header = f'{overall_disaster_alarm_str}\n{overall_rainsnow_alarm_str}\n\n{connect_strs(disaster_alarms, "\n")}\n\n{connect_strs(rainsnow_strs, "\n")}'
+
+        header = f"{overall_disaster_alarm_str}\n{overall_rainsnow_alarm_str}\n\n{disaster_str}\n\n{rainsnow_str}"
     elif if_alarm_rain_snow:
-        header = f'{overall_rainsnow_alarm_str}\n\n{connect_strs(rainsnow_strs, "\n")}'
+        header = f"{overall_rainsnow_alarm_str}\n\n{rainsnow_str}"
     elif if_alarm_disaster:
-        header =f'{overall_disaster_alarm_str}\n\n{connect_strs(disaster_alarms, "\n")}'
+        header =f"{overall_disaster_alarm_str}\n\n{disaster_str}"
 
     if header.strip() != "":
         return header
@@ -234,16 +241,16 @@ def build_24h_weather_brief(city_attr):
     float_temperature = list(map(float, temperature))
     max_temp = max(float_temperature)
     min_temp = min(float_temperature)
-    context = f'温度: {min_temp} - {max_temp}度\n{weather_str}'
+    context = f"温度: {min_temp} - {max_temp}度\n{weather_str}"
 
-    return f'【{city_attr.name}】\n{context}\n{weather_str}\n详细: {city_attr.fxLink}'
+    return f"【{city_attr.name}】\n{context}\n{weather_str}\n详细: {city_attr.fxLink}"
 
 # build string of weather in 24h in format of "starttime-endtime: weather"
 def build_24h_weather_str(weather_str_attr):
     # print(weather_str_attr)
     str_attr = []
     for str in weather_str_attr:
-        str_attr.append(f'{parse_time(str[1])} - {parse_time(str[2])}: {str[0]}')
+        str_attr.append(f"{parse_time(str[1])} - {parse_time(str[2])}: {str[0]}")
     return connect_strs(str_attr, "\n")
 
 # parse time from %Y-%m-%dT%H:%M%z to
