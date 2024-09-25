@@ -20,7 +20,7 @@ alarm_dic = ["雨", "雪", "雹", "雷", "暴", "霾"]
 # say if your task starts at 8 am, the api would fetch the following 24h data from 9 am to 7pm tomorrow, so only 9am to 24:00, overall 15 data is needed for today's notification
 # this can be set to 24, if 24h data is need
 # also, if you don't need that much, you can set it to the amount of data you need
-hours_needed = 15
+hours_needed = 24
 
 # define City to store all information for each city
 class City:
