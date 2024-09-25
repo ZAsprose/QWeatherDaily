@@ -19,7 +19,7 @@ Qinglong daily weather brief script for multiple cities using QWeather web api
     
     信息：为了查找精确，本项目采取三段字符串，每个信息用英文逗号分隔。分别是“关键词,省份/上级行政区划,搜索范围（ISO 3166 所定义的国家代码）”
     
-    详细说明在[和风天气GeoAPI文档](https://dev.qweather.com/docs/api/geoapi/city-lookup/)
+    详细说明在 https://dev.qweather.com/docs/api/geoapi/city-lookup/
     
     范例："茶陵,湖南,cn;melbourne,victoria,au;144.96,-37.82"
 
