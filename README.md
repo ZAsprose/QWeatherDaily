@@ -1,5 +1,5 @@
 # QWeatherDaily
-[![English](https://img.shields.io/badge/lang-en-blue.svg)](#english)
+[![English](https://img.shields.io/badge/lang-en-blue.svg)](#English)
 [![中文](https://img.shields.io/badge/lang-cn-red.svg)](#中文)
 
 [Demo Output/输出样例](#DemoOutput)
@@ -33,7 +33,7 @@ Qinglong daily weather brief script for multiple cities using QWeather web api
 
 脚本的通知是引用了青龙自带的notify方式发送。
 
-## english
+## English
 qinglong enviroment param needed:
 
   qweather_key: web api key from qweather.com
