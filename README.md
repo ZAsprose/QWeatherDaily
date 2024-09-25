@@ -1,13 +1,16 @@
 # QWeatherDaily
 [![English](https://img.shields.io/badge/lang-en-blue.svg)](#english)
 [![中文](https://img.shields.io/badge/lang-cn-red.svg)](#中文)
+
 [Demo Output/输出样例](#DemoOutput)
 
 Qinglong daily weather brief script for multiple cities using QWeather web api 
+
 基于青龙面板的接入和风天气api的每日天气简报脚本
 
 ## 中文
 需要的环境变量：
+
   qweather_key：和风天气的web api key。需要在和风天气注册账号，并在控制台中新建项目并建立web api key。将key值保存在环境变量中。
   
   city_list_str：一组由经纬度或城市（地区）信息构成的字符串，每个地点之间用英文引号分隔。
@@ -21,6 +24,7 @@ Qinglong daily weather brief script for multiple cities using QWeather web api
     范例："茶陵,湖南,cn;melbourne,victoria,au;144.96,-37.82"
 
 脚本内变量：
+
   lang: 从api获取的信息语言，目前代码内设定为中文。相应[开发文档](https://dev.qweather.com/docs/resource/language/)
   
   alarm_dic: 需要在信息开头进行提示的天气的关键字数组
@@ -44,7 +48,7 @@ params in the script:
   
   hours_needed：numbers of hour you need. Say if your task starts at 8 am, the api would fetch the following 24h data from 9 am to 7pm tomorrow, so only 9am to 12 pm, overall 15 data is needed for today's notification. In the script is now 24
 
-This scirpt uses qinglong defaultly notify way.
+This scirpt uses qinglong defaultly notify way. Also all build-in message of this script is Chinese.
 
 ## DemoOutput
 【坏天气】茶陵 墨尔本 
