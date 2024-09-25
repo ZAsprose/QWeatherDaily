@@ -1,7 +1,7 @@
 # QWeatherDaily
 [![English](https://img.shields.io/badge/lang-en-blue.svg)](#english)
 [![中文](https://img.shields.io/badge/lang-cn-red.svg)](#中文)
-[![Output](https://img.shields.io/badge/lang-en-blue.svg)](#DemoOutput)
+[Demo Output/输出样例](#DemoOutput)
 
 Qinglong daily weather brief script for multiple cities using QWeather web api 
 基于青龙面板的接入和风天气api的每日天气简报脚本
