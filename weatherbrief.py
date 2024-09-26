@@ -243,7 +243,7 @@ def build_24h_weather_brief(city_attr):
     min_temp = min(float_temperature)
     context = f"温度: {min_temp} - {max_temp}度\n{weather_str}"
 
-    return f"【{city_attr.name}】\n{context}\n{weather_str}\n详细: {city_attr.fxLink}"
+    return f"【{city_attr.name}】\n{context}\n{weather_str}\n详细: <a href=\"{city_attr.fxLink}\">link</a> "
 
 # build string of weather in 24h in format of "starttime-endtime: weather"
 def build_24h_weather_str(weather_str_attr):
