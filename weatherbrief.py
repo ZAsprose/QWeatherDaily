@@ -10,6 +10,9 @@ city_list_str = os.getenv("city_list_str")
 # test string for city_list_str
 # city_list_str = "茶陵,湖南,cn;melbourne,victoria,au;144.96,-37.82"
 
+# private api host from qweather based on https://blog.qweather.com/announce/public-api-domain-change-to-api-host/
+api_host = os.getenv("qweather_api")
+
 # language setting for notify text
 lang = "zh"
 
@@ -76,7 +79,7 @@ class Weather:
 
 # add param to url to fetch in certain language with a valid deve key
 def build_url(url):
-    return url + f"&key={qweatherkey}&lang={lang}"
+    return f"https://{api_host}/" + url + f"&key={qweatherkey}&lang={lang}"
 
 # check if a string is a valid coordinate value defined by qweather
 def if_coordinate(input):
@@ -100,9 +103,9 @@ def create_city_info_struct_from_str(input):
         return None
     else:
         if if_coordinate(cityinfo):
-            url = f"https://geoapi.qweather.com/v2/city/lookup?location={input}&key={qweatherkey}&lang={lang}"
+            url = f"geo/v2/city/lookup?location={input}&key={qweatherkey}&lang={lang}"
         else:
-            url = f"https://geoapi.qweather.com/v2/city/lookup?location={cityinfo_attr[0]}&adm={cityinfo_attr[1]}&range={cityinfo_attr[2]}"
+            url = f"geo/v2/city/lookup?location={cityinfo_attr[0]}&adm={cityinfo_attr[1]}&range={cityinfo_attr[2]}"        
         r = requests.get(build_url(url))
 
         if r.status_code == 200:
@@ -125,16 +128,17 @@ def create_city_info_struct_from_str(input):
 # build disaster alarm info arr for a city
 # use arr in case there are multiple for a city
 def get_disaster_alarm_by_locationid(locationid):
-    r = requests.get(build_url(f"https://devapi.qweather.com/v7/warning/now?location={locationid}"))
+    r = requests.get(build_url(f"v7/warning/now?location={locationid}"))
     if r.status_code == 200:
         disasters = []
         try:
             warnings = json.loads(r.text)['warning']
             for warning in warnings:
                 print(warning)
-                disasters.append(Disaster(warning[0]['title'], warning[0]['severity'], warning[0]['text']))
+                disasters.append(Disaster(warning['title'], warning['severity'], warning['text']))
         except:
             print("error when fetch disasters: " + r.text)
+            print(build_url(f"v7/warning/now?location={locationid}"))
         finally:
             if len(disasters) > 0:
                 return disasters
@@ -145,7 +149,7 @@ def get_disaster_alarm_by_locationid(locationid):
 
 # fetch 24h weather report for a city
 def get_24_weather_report_by_locationid(locationid):
-    r = requests.get(build_url(f"https://devapi.qweather.com/v7/weather/24h?location={locationid}"))
+    r = requests.get(build_url(f"v7/weather/24h?location={locationid}"))
     if r.status_code == 200:
         # print(r.text)
         weathers = []
