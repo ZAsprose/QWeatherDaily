@@ -25,6 +25,9 @@ alarm_dic = ["雨", "雪", "雹", "雷", "暴", "霾"]
 # also, if you don't need that much, you can set it to the amount of data you need
 hours_needed = 24
 
+#title for notification for plusplus
+notify_title = "今日天气简报"
+
 # define City to store all information for each city
 class City:
     # Define the attributes (data members) of the class
@@ -213,14 +216,17 @@ def build_message_header_for_disaster_rainsnow(city_struct_arr):
     print(f'if_alarm_disaster: {if_alarm_disaster}')
 
     header = ""
+    global notify_title
     if if_alarm_rain_snow and if_alarm_disaster:
-
+        notify_title += "【坏天气】+【灾害预警】"
         header = f"{overall_disaster_alarm_str}\n{overall_rainsnow_alarm_str}\n\n{disaster_str}\n\n{rainsnow_str}"
     elif if_alarm_rain_snow:
+        notify_title += "【坏天气】"
         header = f"{overall_rainsnow_alarm_str}\n\n{rainsnow_str}"
     elif if_alarm_disaster:
+        notify_title += "【灾害预警】"
         header =f"{overall_disaster_alarm_str}\n\n{disaster_str}"
-
+        
     if header.strip() != "":
         return header
     else:
@@ -295,4 +301,4 @@ if len(weather_briefs) > 0:
 
     print("=============== result ==============")
     print(context)
-    notify.send("今日天气简报", context)
+    notify.send(notify_title, context)
