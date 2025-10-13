@@ -12,6 +12,10 @@ Qinglong daily weather brief script for multiple cities using QWeather web api
 需要的环境变量：
 
   qweather_key：和风天气的web api key。需要在和风天气注册账号，并在控制台中新建项目并建立web api key。将key值保存在环境变量中。
+  注意：此参数访问根据文档会在将来受到限制，可换成JWT认证并不需要此参数。
+  
+  qweather_private_key, qweather_proj_id,  qweather_private_key_id: 
+  以上3个变量为JWT所需的参数，需要在和风天气的控制台的项目中获取，详情见相应[开发文档](https://dev.qweather.com/docs/configuration/authentication/)
   
   city_list_str：一组由经纬度或城市（地区）信息构成的字符串，每个地点之间用英文引号分隔。
   
@@ -36,7 +40,9 @@ Qinglong daily weather brief script for multiple cities using QWeather web api
 ## English
 qinglong enviroment param needed:
 
-  qweather_key: web api key from qweather.com
+  qweather_key: web api key from qweather.com. In offical document, developer should use JWT instead, and this param will not be needed.  
+
+  qweather_private_key, qweather_proj_id,  qweather_private_key_id: 3 params for JWT. They should be granted from console of qweather. Reference to [QWeather Doc Authentication](https://dev.qweather.com/en/docs/configuration/authentication/)
   
   city_list_str: a string combined by a set of values of longitude,latitude or keyword,Superior administrative divisions of a city,a certain country or region using country code ISO 3166. Reference to [QWeather GeoAPI Doc](https://dev.qweather.com/en/docs/api/geoapi/city-lookup/). e.g.:"茶陵,湖南,cn;melbourne,victoria,au;144.96,-37.82"
 
