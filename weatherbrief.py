@@ -1,4 +1,5 @@
-import requests, json ,re, os
+import requests, json ,re, os, sys, time
+import jwt
 from datetime import datetime
 import notify
 
@@ -12,6 +13,7 @@ city_list_str = os.getenv("city_list_str")
 
 # private api host from qweather based on https://blog.qweather.com/announce/public-api-domain-change-to-api-host/
 api_host = os.getenv("qweather_api")
+jwtt = ""
 
 # language setting for notify text
 lang = "zh"
@@ -82,7 +84,8 @@ class Weather:
 
 # add param to url to fetch in certain language with a valid deve key
 def build_url(url):
-    return f"https://{api_host}/" + url + f"&key={qweatherkey}&lang={lang}"
+    # return f"https://{api_host}/" + url + f"&key={qweatherkey}&lang={lang}"
+    return f"https://{api_host}/" + url + f"&lang={lang}"
 
 # check if a string is a valid coordinate value defined by qweather
 def if_coordinate(input):
@@ -106,10 +109,10 @@ def create_city_info_struct_from_str(input):
         return None
     else:
         if if_coordinate(cityinfo):
-            url = f"geo/v2/city/lookup?location={input}&key={qweatherkey}&lang={lang}"
+            url = f"geo/v2/city/lookup?location={input}&key={qweatherkey}"
         else:
             url = f"geo/v2/city/lookup?location={cityinfo_attr[0]}&adm={cityinfo_attr[1]}&range={cityinfo_attr[2]}"        
-        r = requests.get(build_url(url))
+        r = jwt_request(build_url(url))
 
         if r.status_code == 200:
             city = json.loads(r.text)['location']
@@ -125,13 +128,14 @@ def create_city_info_struct_from_str(input):
                 return City(city[0]['name'], city[0]['id'], weathers, disasters, rainsnowalarm, city[0]['fxLink'])
 
         else:
+            print(url)
             print("invalid city_list_str leads to error when fetch city info: " + r.text)
             return None
 
 # build disaster alarm info arr for a city
 # use arr in case there are multiple for a city
 def get_disaster_alarm_by_locationid(locationid):
-    r = requests.get(build_url(f"v7/warning/now?location={locationid}"))
+    r = jwt_request(build_url(f"v7/warning/now?location={locationid}"))
     if r.status_code == 200:
         disasters = []
         try:
@@ -152,7 +156,7 @@ def get_disaster_alarm_by_locationid(locationid):
 
 # fetch 24h weather report for a city
 def get_24_weather_report_by_locationid(locationid):
-    r = requests.get(build_url(f"v7/weather/24h?location={locationid}"))
+    r = jwt_request(build_url(f"v7/weather/24h?location={locationid}"))
     if r.status_code == 200:
         # print(r.text)
         weathers = []
@@ -226,7 +230,7 @@ def build_message_header_for_disaster_rainsnow(city_struct_arr):
     elif if_alarm_disaster:
         notify_title += "【灾害预警】"
         header =f"{overall_disaster_alarm_str}\n\n{disaster_str}"
-        
+
     if header.strip() != "":
         return header
     else:
@@ -253,7 +257,7 @@ def build_24h_weather_brief(city_attr):
     min_temp = min(float_temperature)
     context = f"温度: {min_temp} - {max_temp}度\n{weather_str}"
 
-    return f"【{city_attr.name}】\n{context}\n详细: <a href=\"{city_attr.fxLink}\">link</a> "
+    return f"【{city_attr.name}】\n{context}\n详细: <a href=\"{city_attr.fxLink}\">详情链接</a>"
 
 # build string of weather in 24h in format of "starttime-endtime: weather"
 def build_24h_weather_str(weather_str_attr):
@@ -273,9 +277,40 @@ def parse_time(time):
 def connect_strs(strs, connector):
     return connector.join(strs)
 
+# form jwt
+def generate_jwt():
+    private_key = os.getenv("qweather_private_key")
+    payload = {
+        'iat': int(time.time()) - 30,
+        'exp': int(time.time()) + 900,
+        'sub': os.getenv("qweather_proj_id")
+    }
+    headers = {
+        'kid': os.getenv("qweather_private_key_id")
+    }
+    encoded_jwt = jwt.encode(payload, private_key, algorithm='EdDSA', headers = headers)
+    print(f"JWT:  {encoded_jwt}")
+    return encoded_jwt
+
+# send request with jwt
+def jwt_request(url):
+    headers = {"Authorization": f"Bearer {jwtt}"}
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+        # print("Request successful!")
+        return(response)
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"Response content: {e.response.text}")
+        return None
+
 # main
 city_list = re.split(";", city_list_str)
 city_struct_arr = []
+
+jwtt = generate_jwt()
 
 for cityinfo in city_list:
     city_strut = create_city_info_struct_from_str(cityinfo)
@@ -297,8 +332,9 @@ for city in city_struct_arr:
 if len(weather_briefs) > 0:
     context = connect_strs(weather_briefs, "\n\n")
     if header != None:
-        context  = header + "\n\n\n" + context
+        context  = header + "\n\n\n" + context        
 
     print("=============== result ==============")
     print(context)
     notify.send(notify_title, context)
+
